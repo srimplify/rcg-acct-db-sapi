@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="get-by-id" doc:id="a3eff966-fd58-49b2-a267-aab99572910e" >
+		<db:select doc:name="Select" doc:id="255d045a-4991-4f02-a3d1-39a20b0c04fa" config-ref="mysql_localhost">
+			<db:sql ><![CDATA[SELECT * FROM sf_account
+WHERE SF_ID = :sfid
+]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	sfid: vars.acct_id
+}]]]></db:input-parameters>
+		</db:select>
+	</flow>
+	<flow name="get-records-bycount" doc:id="dd6eda08-973d-4bfe-ab56-5397e91b56f8" >
+		<db:select doc:name="Select" doc:id="246d40a3-1e0e-409e-8dec-f8a8e7efa044" config-ref="mysql_localhost">
+			<db:sql ><![CDATA[SELECT name, number, bill_street, bill_city, bill_state, bill_zip, phone, sf_id 
+FROM acme_test.SF_Account sa order by number limit :count]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	count: message.attributes.queryParams.count as Number default 1
+	
+}]]]></db:input-parameters>
+		</db:select>
+	</flow>
+	<flow name="update" doc:id="551bc467-bc62-4f34-b037-1035303285b3" >
+		<db:bulk-update doc:name="Bulk update" doc:id="cb091acb-feb1-483e-9a08-a935bca73003" config-ref="mysql_localhost">
+			<db:sql><![CDATA[UPDATE sf_account SET
+
+sf_id = :id,
+bill_street = :bill_street,
+bill_city = :bill_city, 
+bill_state = :bill_state, 
+bill_zip = :bill_zip, 
+phone = :phone,
+name = :name
+
+WHERE number = :number]]></db:sql>
+		</db:bulk-update>
+	</flow>
+	<flow name="create" doc:id="1f78bded-696c-47ba-9e10-c823d18e5f91" >
+		<db:bulk-insert doc:name="Bulk insert" doc:id="d7586ac0-a84e-4108-ac98-2d46f48dc004" config-ref="mysql_localhost">
+			<db:sql ><![CDATA[Insert into sf_account (sf_id, name, number, bill_street, bill_city, bill_state, bill_zip, phone, last_updated)
+Values
+
+(:id, :name, :number, :bill_street, :bill_city, :bill_state, :bill_zip, :phone, now())]]></db:sql>
+		</db:bulk-insert>
+	</flow>
+	<flow name="record-count" doc:id="12304f2d-725c-4e0c-9a71-715abf0f045e" >
+		<db:select doc:name="Select" doc:id="96517df6-567a-4f23-83db-95e5285a4a9a" config-ref="mysql_localhost">
+			<db:sql ><![CDATA[SELECT COUNT(*) FROM acme_test.SF_Account]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="8483bda2-6147-4d99-b9e1-0cdf0c18e5b6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+    "record-count": payload[0][0]
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

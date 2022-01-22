@@ -1,0 +1,58 @@
+
+SF_ACCOUNT TABLE DDL
+-- acme_test.SF_Account definition
+
+CREATE TABLE `SF_Account` (
+  `sf_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `number` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `bill_street` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `bill_city` varchar(100) DEFAULT NULL,
+  `bill_state` varchar(100) DEFAULT NULL,
+  `bill_zip` varchar(100) DEFAULT NULL,
+  `phone` varchar(100) DEFAULT NULL,
+  `last_updated` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+Initial load of salesforce accounts into database:
+http://localhost:8082/api/dbload
+
+
+======================
+SAMPLE SQL STATEMENTS
+
+SELECT * FROM acme_test.SF_Account sa order by number
+
+
+// Adam Roaster
+UPDATE acme_test.SF_Account set phone="(513) 632-1021" where number = "B101"	
+
+
+
+select count(*) from acme_test.SF_Account sa 
+
+
+
+delete from acme_test.SF_Account where `number` = "00101"
+COMMIT 
+
+
+
+UPDATE acme_test.SF_Account set bill_zip ="94117" where number = "B1234"
+
+
+
+alter TABLE acme_test.SF_Account update column last_updated TIMESTAMP ON INSERT CURRENT_TIMESTAMP;
+
+update acme_test.SF_Account set last_updated = NOW() 
+
+update  acme_test.SF_Account set name="Test-1234" where number="00101"
+
+INSERT into acme_test.SF_Account 
+(name , number, last_updated )
+values ("Testing Company","1234", now())
+
+update acme_test.SF_Account set `number` ='C01' where sf_id ='0013i000004L6ChAAK'
+
+DELETE from  acme_test.SF_Account where name="Test-1234"

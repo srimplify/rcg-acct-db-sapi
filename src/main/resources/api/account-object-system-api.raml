@@ -1,0 +1,73 @@
+#%RAML 1.0
+title: Account Object System API
+description: System API for the account object in the database
+
+types: 
+  AccountType: !include exchange_modules/df7c03fd-6179-463d-ab31-640351d3faca/account-object-data-type/1.0.1/account-object-data-type.raml
+
+
+/account:
+  post:
+    description: Create new account record(s)
+    body:
+      application/json:
+        type: AccountType[]
+    responses:
+      201:
+        body:
+          application/json:
+            type: any
+
+  put:
+    description: Update existing account record(s)
+    body:
+      application/json:
+        type: AccountType[]
+    responses:
+      201:
+        body:
+          application/json:
+            type: any
+
+  get:
+    description: Retrieve last 'n' records
+    queryParameters:
+      count:
+        type: number
+        default: 1
+    responses:
+      200:
+        body:
+          application/json:
+            type: AccountType[]
+            examples: !include Account_object-ex.raml
+              
+  /{acct_id}:
+    uriParameters:
+      acct_id:
+        type: string
+    get:
+      description: Get account by ID
+      responses:
+        200:
+          body:
+            application/json:
+              type: AccountType       
+
+
+  /count:
+    get:
+      description: Get record count
+      responses:
+        200:
+          body:
+            application/json:
+              type: any
+
+
+    
+
+    
+
+
+
